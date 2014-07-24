@@ -18,7 +18,7 @@ namespace ExpenseTracker.Controllers
         {
             using (ExpenseDB db = new ExpenseDB())
             {
-                if (db.Users.Where(x => x.Username == username).Any())
+                if (db.Users.Where(x => x.Username == username && x.Password == password).Any())
                 {
                     return Ok();
                 }

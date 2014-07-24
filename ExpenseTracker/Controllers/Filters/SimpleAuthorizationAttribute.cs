@@ -9,7 +9,6 @@ using System.Web.Mvc;
 using System.Net.Http.Headers;
 using System.Web.Mvc.Filters;
 using System.Text;
-using ExpenseTracker.Models;
 using System.Web.Http.Filters;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -18,10 +17,6 @@ namespace ExpenseTracker.Controllers.Filters
 {
     public class SimpleAuthorizationFilter : AuthorizationFilterAttribute
     {
-        private const string BasicAuthResponseHeader = "WWW-Authenticate";
-        private const string BasicAuthResponseHeaderValue = "Basic";
-        readonly ExpenseDB Context = new ExpenseDB();
-
         protected User CurrentUser
         {
             get { return Thread.CurrentPrincipal as User; }
@@ -33,7 +28,7 @@ namespace ExpenseTracker.Controllers.Filters
             var authHeader = actionContext.Request.Headers.Authorization;
 
             if (authHeader == null)
-                UnauthorizedRequest(actionContext);
+                UnauthorizedRequest();
 
             Credentials parsedCredentials = ParseAuthorizationHeader(authHeader.Parameter);
 
@@ -42,15 +37,15 @@ namespace ExpenseTracker.Controllers.Filters
                 User usr = db.Users.Where(x => x.Username == parsedCredentials.Username && x.Password == parsedCredentials.Password).FirstOrDefault();
 
                 if (usr == null)
-                    UnauthorizedRequest(actionContext);
-            }
+                    UnauthorizedRequest();
 
+                this.CurrentUser = usr;
+            }
         }
 
-        protected void UnauthorizedRequest(HttpActionContext actionContext)
+        protected void UnauthorizedRequest()
         {
-            var challengeMessage = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized);
-            throw new HttpResponseException(challengeMessage);
+            throw new HttpResponseException(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized));
         }
 
         private Credentials ParseAuthorizationHeader(string authHeader)

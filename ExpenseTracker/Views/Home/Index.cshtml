@@ -1,24 +1,142 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+﻿<style>
+    .center {
+        float: none;
+        margin: 0 auto 0 auto;
+    }
+    .app-page {
+        
+    }
+    .actionsBar {
+        padding: 10px 0 0 0;
+        text-align: right;
+    }
+</style>
+<div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.Login), with: LoginVM">
+    <div class="col-md-4 center">
+        <form role="form">
+            <fieldset>
+                <legend>Login</legend>
+                <div class="alert alert-danger" data-bind="visible: LoginError, text: LoginError"></div>
+                <div class="form-group">
+                    <label for="username">User Name</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter your username" data-bind="value: Username" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" data-bind="value: Password" />
+                </div>
+                <br />
+                <div class="form-group">
+                    <button id="login" class="btn btn-primary" data-bind="click: LoginClicked.bind($data)">Login</button>
+                    <button id="createaccount" class="btn btn-default" data-bind="click: $parent.CreateAccountClicked.bind($parent)">Create Account</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
 </div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+<div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.CreateAccount), with: CreateAccountVM">
+    <div class="col-md-4 center">
+        <form role="form">
+            <fieldset>
+                <legend>Create Account</legend>
+                <div class="alert alert-danger" data-bind="visible: CreationError, text: CreationError"></div>
+                <div class="form-group">
+                    <label for="username">User Name</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter your desired username" data-bind="value: Username" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your desired password" data-bind="value: Password" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Confirm Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Confirm your password" data-bind="value: ConfirmPassword" />
+                </div>
+                <br />
+                <div class="form-group">
+                    <button id="createaccount" class="btn btn-success" data-bind="click: CreateAccountClicked.bind($data)">Create Account</button>
+                    <button id="createaccount" class="btn btn-danger" data-bind="click: $parent.CancelAccountClicked.bind($parent)">Cancel</button>
+                </div>
+            </fieldset>
+        </form>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+</div>
+<div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.ExpenseList), with: ExpensesVM">
+    <div class="col-md-9">
+        <h1>Expense Listing</h1>
+        <div class="actionsBar">
+            <button class="btn btn-success" data-bind="click: AddNewExpense">
+                <span class="glyphicon glyphicon-plus"></span> Add Expense
+            </button>
+            <button class="btn btn-primary">
+                <span class="glyphicon glyphicon-print"></span> Print Weekly Report
+            </button>
+        </div>
+        <table id="expenseList" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Comment</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: Expenses">
+                <tr>
+                    <td data-bind="text: FormattedDate"></td>
+                    <td data-bind="text: Description"></td>
+                    <td data-bind="text: FormattedAmount"></td>
+                    <td data-bind="text: Comment"></td>
+                    <td>
+                        <button class="btn btn-danger" data-bind="click: $parent.RemoveExpense.bind($parent)">
+                            <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="top" title="Remove This Expense"></span>
+                        </button>
+                        <button class="btn btn-primary" data-bind="click: $parent.EditExpense.bind($parent)">
+                            <span class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="Edit This Expense"></span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+
+            </tfoot>
+        </table>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+</div>
+
+<div id="EditExpenseDialog" class="modal fade" data-bind="with: $root.ExpensesVM.EditCreateExpenseVM">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="Date">Date</label>
+                        <input type="text" class="form-control input-append date" id="Date" data-date-format="mm-dd-yyyy" placeholder="Expense Date" data-bind="datepicker: Date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Description">Description</label>
+                        <input type="text" class="form-control" id="Description" placeholder="Expense Description" data-bind="value: Description" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Amount">Amount</label>
+                        <input type="text" class="form-control" id="Amount" placeholder="Enter Amount" data-bind="value: Amount" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Comment">Comment</label>
+                        <textarea class="form-control" id="Comment" placeholder="Enter Comment" data-bind="value: Comment"></textarea>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bind="visible: Id != -1" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" data-bind="visible: Id == -1, click: $root.ExpensesVM.SaveNewExpense.bind($root.ExpensesVM)">Save Expense</button>
+                <button type="button" class="btn btn-danger" data-bind="visible: Id == -1, click: $root.ExpensesVM.CancelNewExpense">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>

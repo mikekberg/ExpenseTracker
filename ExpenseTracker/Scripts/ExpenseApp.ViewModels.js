@@ -54,6 +54,16 @@ var ExpenseApp;
                     return "$" + Number(_this.Amount()).toFixed(2);
                 });
             }
+            ExpenseViewModel.prototype.ToJSON = function () {
+                var js = ko.toJS(this);
+                js.Date = js.Date.toLocaleString().substring(0, js.Date.toLocaleString().indexOf(' '));
+
+                delete js['FormattedDate'];
+                delete js['FormattedAmount'];
+                delete js['ToJSON'];
+
+                return js;
+            };
             return ExpenseViewModel;
         })();
         ViewModels.ExpenseViewModel = ExpenseViewModel;
@@ -68,7 +78,7 @@ var ExpenseApp;
                 /* Get Expenses From the Service */
                 ExpenseApp.Services.Expense.GetAll().done(function (expenses) {
                     ko.utils.arrayPushAll(_this.Expenses, $.map(expenses, function (exp) {
-                        return new ExpenseViewModel(exp.Id, exp.Date, exp.Description, exp.Amount, exp.Comment);
+                        return new ExpenseViewModel(exp.Id, new Date(Date.parse(exp.Date)), exp.Description, exp.Amount, exp.Comment);
                     }));
                     _this.Loading = ko.observable(false);
                 });
@@ -78,7 +88,7 @@ var ExpenseApp;
             };
 
             ExpenseListingViewModel.prototype.EditExpense = function (expense) {
-                this.EditCreateExpenseVM(expense);
+                this.EditCreateExpenseVM(new ExpenseViewModel(expense.Id, expense.Date(), expense.Description(), expense.Amount(), expense.Comment()));
                 $("#EditExpenseDialog").modal();
             };
 
@@ -88,7 +98,25 @@ var ExpenseApp;
             };
 
             ExpenseListingViewModel.prototype.SaveNewExpense = function (expense) {
-                this.Expenses.push(expense);
+                var _this = this;
+                ExpenseApp.Services.Expense.AddExpense(expense.ToJSON()).done(function () {
+                    return _this.Expenses.push(expense);
+                });
+                $("#EditExpenseDialog").modal("hide");
+            };
+
+            ExpenseListingViewModel.prototype.UpdateExpense = function (expense) {
+                var editedViewMode = jQuery.grep(this.Expenses(), function (exp) {
+                    return exp.Id == expense.Id;
+                })[0];
+
+                editedViewMode.Amount(expense.Amount());
+                editedViewMode.Comment(expense.Comment());
+                editedViewMode.Date(expense.Date());
+                editedViewMode.Description(expense.Description());
+
+                ExpenseApp.Services.Expense.UpdateExpense(editedViewMode.ToJSON());
+
                 $("#EditExpenseDialog").modal("hide");
             };
 

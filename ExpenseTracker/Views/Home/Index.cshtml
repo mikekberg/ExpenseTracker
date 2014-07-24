@@ -133,7 +133,7 @@
                 </fieldset>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-bind="visible: Id != -1" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" data-bind="visible: Id != -1, click: $root.ExpensesVM.UpdateExpense.bind($root.ExpensesVM)">Update Expense</button>
                 <button type="button" class="btn btn-success" data-bind="visible: Id == -1, click: $root.ExpensesVM.SaveNewExpense.bind($root.ExpensesVM)">Save Expense</button>
                 <button type="button" class="btn btn-danger" data-bind="visible: Id == -1, click: $root.ExpensesVM.CancelNewExpense">Cancel</button>
             </div>

@@ -61,6 +61,17 @@ module ExpenseApp.ViewModels {
             this.FormattedDate = ko.computed(() => this.Date().toLocaleString().substring(0, this.Date().toLocaleString().indexOf(' ')));
             this.FormattedAmount = ko.computed(() => "$" + Number(this.Amount()).toFixed(2));
         }
+
+        public ToJSON() {
+            var js = ko.toJS(this);
+            js.Date = js.Date.toLocaleString().substring(0, js.Date.toLocaleString().indexOf(' '));
+
+            delete js['FormattedDate'];
+            delete js['FormattedAmount'];
+            delete js['ToJSON'];
+
+            return js;
+        }
     }
 
     export class ExpenseListingViewModel {
@@ -77,7 +88,7 @@ module ExpenseApp.ViewModels {
 
             /* Get Expenses From the Service */
             Services.Expense.GetAll().done(expenses => {
-                ko.utils.arrayPushAll(this.Expenses, $.map(expenses, exp => new ExpenseViewModel(exp.Id, exp.Date, exp.Description, exp.Amount, exp.Comment))); 
+                ko.utils.arrayPushAll(this.Expenses, $.map(expenses, exp => new ExpenseViewModel(exp.Id, new Date(Date.parse(exp.Date)), exp.Description, exp.Amount, exp.Comment))); 
                 this.Loading = ko.observable(false);
             });
         }
@@ -87,7 +98,7 @@ module ExpenseApp.ViewModels {
         }
 
         public EditExpense(expense: ExpenseViewModel) {
-            this.EditCreateExpenseVM(expense);
+            this.EditCreateExpenseVM(new ExpenseViewModel(expense.Id, expense.Date(), expense.Description(), expense.Amount(), expense.Comment()));
             $("#EditExpenseDialog").modal();
         }
 
@@ -97,7 +108,20 @@ module ExpenseApp.ViewModels {
         }
 
         public SaveNewExpense(expense: ExpenseViewModel) {
-            this.Expenses.push(expense);
+            Services.Expense.AddExpense(expense.ToJSON()).done(() => this.Expenses.push(expense));
+            $("#EditExpenseDialog").modal("hide");
+        }
+
+        public UpdateExpense(expense: ExpenseViewModel) {
+            var editedViewMode = jQuery.grep(this.Expenses(), exp => exp.Id == expense.Id)[0];
+
+            editedViewMode.Amount(expense.Amount());
+            editedViewMode.Comment(expense.Comment());
+            editedViewMode.Date(expense.Date());
+            editedViewMode.Description(expense.Description());
+
+            Services.Expense.UpdateExpense(editedViewMode.ToJSON());
+
             $("#EditExpenseDialog").modal("hide");
         }
 

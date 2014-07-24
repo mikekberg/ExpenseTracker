@@ -10,6 +10,38 @@ var ExpenseApp;
         })();
         Services.IMockUser = IMockUser;
 
+        var WebAPIExpenseAppExpenseService = (function () {
+            function WebAPIExpenseAppExpenseService(user) {
+                this.GetAllURL = "/api/expenses/getall";
+                this.AddUrl = "/api/expenses/add";
+                this.UpdateUrl = "/api/expenses/update";
+                this.RemoveUrl = "/api/expenses/delete";
+                $.ajaxSettings.cache = false;
+
+                if (user) {
+                    $.ajaxSettings.headers = { 'Authorization': 'basic ' + user.GetAuthKey() };
+                    this.User = user;
+                }
+            }
+            WebAPIExpenseAppExpenseService.prototype.GetAll = function () {
+                return $.ajax({ url: this.GetAllURL });
+            };
+
+            WebAPIExpenseAppExpenseService.prototype.AddExpense = function (expense) {
+                return $.ajax({ url: this.AddUrl, data: expense, type: 'POST' });
+            };
+
+            WebAPIExpenseAppExpenseService.prototype.UpdateExpense = function (expense) {
+                return $.ajax({ url: this.UpdateUrl, data: expense, type: 'POST' });
+            };
+
+            WebAPIExpenseAppExpenseService.prototype.RemoveExpense = function (expense) {
+                return $.ajax({ url: this.RemoveUrl, data: { expenseId: expense } });
+            };
+            return WebAPIExpenseAppExpenseService;
+        })();
+        Services.WebAPIExpenseAppExpenseService = WebAPIExpenseAppExpenseService;
+
         var MockExpenseAppExpenseService = (function () {
             function MockExpenseAppExpenseService() {
                 this.Expenses = [
@@ -126,7 +158,7 @@ var ExpenseApp;
 
         /* Simple Dependancy Injection */
         Services.Auth = new MockExpenseAppAuthService();
-        Services.Expense = new MockExpenseAppExpenseService();
+        Services.Expense = new WebAPIExpenseAppExpenseService(new ExpenseApp.ExpenseAppUser("mike", "test"));
     })(ExpenseApp.Services || (ExpenseApp.Services = {}));
     var Services = ExpenseApp.Services;
 })(ExpenseApp || (ExpenseApp = {}));

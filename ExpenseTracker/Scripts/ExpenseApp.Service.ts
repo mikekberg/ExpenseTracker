@@ -19,6 +19,39 @@ module ExpenseApp.Services {
         Password: string;
     }
 
+    export class WebAPIExpenseAppExpenseService implements IExpenseAppExpenseService {
+        public GetAllURL = "/api/expenses/getall";
+        public AddUrl = "/api/expenses/add";
+        public UpdateUrl = "/api/expenses/update";
+        public RemoveUrl = "/api/expenses/delete"
+        public User: ExpenseAppUser;
+
+        constructor(user?: ExpenseAppUser) {
+            $.ajaxSettings.cache = false;
+
+            if (user) {
+                $.ajaxSettings.headers = { 'Authorization': 'basic ' + user.GetAuthKey() };
+                this.User = user;
+            }
+        }
+
+        public GetAll() {
+            return $.ajax({ url: this.GetAllURL });
+        }
+
+        public AddExpense(expense: IExpense) {
+            return $.ajax({ url: this.AddUrl, data: expense, type: 'POST' });
+        }
+
+        public UpdateExpense(expense: IExpense) {
+            return $.ajax({ url: this.UpdateUrl, data: expense, type: 'POST' });
+        }
+
+        public RemoveExpense(expense: number) {
+            return $.ajax({ url: this.RemoveUrl, data: { expenseId: expense } });
+        }
+    }
+
     export class MockExpenseAppExpenseService implements IExpenseAppExpenseService {
         public Expenses: IExpense[];
 
@@ -127,5 +160,5 @@ module ExpenseApp.Services {
 
     /* Simple Dependancy Injection */
     export var Auth: IExpenseAppAuthService = new MockExpenseAppAuthService();
-    export var Expense: IExpenseAppExpenseService = new MockExpenseAppExpenseService();
+    export var Expense: IExpenseAppExpenseService = new WebAPIExpenseAppExpenseService(new ExpenseAppUser("mike", "test"));
 } 

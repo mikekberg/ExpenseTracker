@@ -63,7 +63,9 @@ namespace ExpenseTracker.Controllers
             return Ok();
         }
 
+        
         [Route("api/expenses/delete")]
+        [HttpGet]
         public IHttpActionResult Delete(int expenseId)
         {
             using (var db = new ExpenseDB())

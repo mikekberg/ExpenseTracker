@@ -58,13 +58,13 @@ module ExpenseApp.ViewModels {
             this.Amount = ko.observable(Amount);
             this.Comment = ko.observable(Comment);
 
-            this.FormattedDate = ko.computed(() => this.Date().toLocaleString().substring(0, this.Date().toLocaleString().indexOf(' ')));
+            this.FormattedDate = ko.computed(() => (this.Date().getMonth() + 1) + '/' + this.Date().getDate() + '/' + this.Date().getFullYear());
             this.FormattedAmount = ko.computed(() => "$" + Number(this.Amount()).toFixed(2));
         }
 
         public ToJSON() {
             var js = ko.toJS(this);
-            js.Date = js.Date.toLocaleString().substring(0, js.Date.toLocaleString().indexOf(' '));
+            js.Date = js.Date.toJSON();
 
             delete js['FormattedDate'];
             delete js['FormattedAmount'];

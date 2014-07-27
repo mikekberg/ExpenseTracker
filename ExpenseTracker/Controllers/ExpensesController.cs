@@ -7,6 +7,7 @@ using System.Web.Http;
 using ExpenseTracker.Controllers.Filters;
 using ExpenseTracker.Models;
 using System.Threading;
+using System.Globalization;
 
 namespace ExpenseTracker.Controllers
 {
@@ -41,6 +42,17 @@ namespace ExpenseTracker.Controllers
                 db.SaveChanges();
 
                 return Ok();
+            }
+        }
+
+        [Route("api/expenses/expensesbyweek")]
+        public IHttpActionResult GetExpensesByWeek()
+        {
+            using (var db = new ExpenseDB())
+            {
+                db.Users.Attach(this.CurrentUser);
+                return Ok(this.CurrentUser.Expenses.GroupBy(d => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d.Date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Saturday))
+                    .Select(w => new { Week = w.Key, Total = w.Sum(x => x.Amount), Expenses = w, Average = Math.Round(w.Average(x => x.Amount), 2) }).ToArray());
             }
         }
 

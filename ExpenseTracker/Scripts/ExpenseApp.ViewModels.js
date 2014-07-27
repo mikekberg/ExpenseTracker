@@ -48,7 +48,7 @@ var ExpenseApp;
                 this.Comment = ko.observable(Comment);
 
                 this.FormattedDate = ko.computed(function () {
-                    return _this.Date().toLocaleString().substring(0, _this.Date().toLocaleString().indexOf(' '));
+                    return (_this.Date().getMonth() + 1) + '/' + _this.Date().getDate() + '/' + _this.Date().getFullYear();
                 });
                 this.FormattedAmount = ko.computed(function () {
                     return "$" + Number(_this.Amount()).toFixed(2);
@@ -56,7 +56,7 @@ var ExpenseApp;
             }
             ExpenseViewModel.prototype.ToJSON = function () {
                 var js = ko.toJS(this);
-                js.Date = js.Date.toLocaleString().substring(0, js.Date.toLocaleString().indexOf(' '));
+                js.Date = js.Date.toJSON();
 
                 delete js['FormattedDate'];
                 delete js['FormattedAmount'];

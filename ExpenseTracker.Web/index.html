@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Expense Apss</title>
+    <link href="css/bootstrap.css" rel="stylesheet" />
+    <link href="css/datepicker.css" rel="stylesheet" />
+    <link href="css/Site.css" rel="stylesheet" />
+    <style>
+        .center {
+            float: none;
+            margin: 0 auto 0 auto;
+        }
+
+        .app-page {
+        }
+
+        .actionsBar {
+            padding: 10px 0 0 0;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        <div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.Login), with: LoginVM">
+            <div class="col-md-4 center">
+                <form role="form">
+                    <fieldset>
+                        <legend>Login</legend>
+                        <div class="alert alert-danger" data-bind="visible: LoginError, text: LoginError"></div>
+                        <div class="form-group">
+                            <label for="username">User Name</label>
+                            <input type="text" class="form-control" id="username" placeholder="Enter your username" data-bind="value: Username" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter your password" data-bind="value: Password" />
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <button id="login" class="btn btn-primary" data-bind="click: LoginClicked.bind($data)">Login</button>
+                            <button id="createaccount" class="btn btn-default" data-bind="click: $parent.CreateAccountClicked.bind($parent)">Create Account</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.CreateAccount), with: CreateAccountVM">
+            <div class="col-md-4 center">
+                <form role="form">
+                    <fieldset>
+                        <legend>Create Account</legend>
+                        <div class="alert alert-danger" data-bind="visible: CreationError, text: CreationError"></div>
+                        <div class="form-group">
+                            <label for="username">User Name</label>
+                            <input type="text" class="form-control" id="username" placeholder="Enter your desired username" data-bind="value: Username" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter your desired password" data-bind="value: Password" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Confirm Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Confirm your password" data-bind="value: ConfirmPassword" />
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <button id="createaccount" class="btn btn-success" data-bind="click: CreateAccountClicked.bind($data)">Create Account</button>
+                            <button id="createaccount" class="btn btn-danger" data-bind="click: $parent.CancelAccountClicked.bind($parent)">Cancel</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.ExpenseList), with: ExpensesVM">
+            <div class="col-md-9">
+                <h1>Expense Listing</h1>
+                <div class="actionsBar">
+                    <button class="btn btn-success" data-bind="click: AddNewExpense">
+                        <span class="glyphicon glyphicon-plus"></span> Add Expense
+                    </button>
+                    <button class="btn btn-primary">
+                        <span class="glyphicon glyphicon-print"></span> Print Weekly Report
+                    </button>
+                </div>
+                <table id="expenseList" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Comment</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: Expenses">
+                        <tr>
+                            <td data-bind="text: FormattedDate"></td>
+                            <td data-bind="text: Description"></td>
+                            <td data-bind="text: FormattedAmount"></td>
+                            <td data-bind="text: Comment"></td>
+                            <td>
+                                <button class="btn btn-danger" data-bind="click: $parent.RemoveExpense.bind($parent)">
+                                    <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="top" title="Remove This Expense"></span>
+                                </button>
+                                <button class="btn btn-primary" data-bind="click: $parent.EditExpense.bind($parent)">
+                                    <span class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="top" title="Edit This Expense"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div id="EditExpenseDialog" class="modal fade" data-bind="with: $root.ExpensesVM.EditCreateExpenseVM">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title">Modal title</h4>
+                    </div>
+                    <div class="modal-body">
+                        <fieldset>
+                            <div class="form-group">
+                                <label for="Date">Date</label>
+                                <input type="text" class="form-control input-append date" id="Date" data-date-format="mm-dd-yyyy" placeholder="Expense Date" data-bind="datepicker: Date" />
+                            </div>
+                            <div class="form-group">
+                                <label for="Description">Description</label>
+                                <input type="text" class="form-control" id="Description" placeholder="Expense Description" data-bind="value: Description" />
+                            </div>
+                            <div class="form-group">
+                                <label for="Amount">Amount</label>
+                                <input type="text" class="form-control" id="Amount" placeholder="Enter Amount" data-bind="value: Amount" />
+                            </div>
+                            <div class="form-group">
+                                <label for="Comment">Comment</label>
+                                <textarea class="form-control" id="Comment" placeholder="Enter Comment" data-bind="value: Comment"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-bind="visible: Id != -1, click: $root.ExpensesVM.UpdateExpense.bind($root.ExpensesVM)">Update Expense</button>
+                        <button type="button" class="btn btn-success" data-bind="visible: Id == -1, click: $root.ExpensesVM.SaveNewExpense.bind($root.ExpensesVM)">Save Expense</button>
+                        <button type="button" class="btn btn-danger" data-bind="visible: Id == -1, click: $root.ExpensesVM.CancelNewExpense">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="Scripts/libs/jquery-1.10.2.js"></script>
+    <script src="Scripts/libs/jquery.base64.js"></script>
+    <script src="Scripts/libs/bootstrap-datepicker.js"></script>
+    <script src="Scripts/libs/bootstrap.js"></script>
+    <script src="Scripts/libs/knockout-3.1.0.js"></script>
+    <script src="Scripts/libs/knockout.binds.datepicker.js"></script>
+
+    <script src="Scripts/ExpenseApp.js"></script>
+    <script src="Scripts/ExpenseApp.Service.js"></script>
+    <script src="Scripts/ExpenseApp.ViewModels.js"></script>
+    <script>
+        window.AppViewModel = new ExpenseApp.ViewModels.ExpenseAppViewModel();
+        ko.applyBindings(window.AppViewModel);
+    </script>
+</body>
+</html>

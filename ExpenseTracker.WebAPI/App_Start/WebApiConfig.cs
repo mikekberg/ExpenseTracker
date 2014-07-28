@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 
@@ -16,6 +17,8 @@ namespace ExpenseTracker
 
             // Web API routes
             config.MapHttpAttributeRoutes();
+
+            config.EnableCors();
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

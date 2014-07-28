@@ -8,9 +8,11 @@ using System.Web.Http;
 using ExpenseTracker.Models;
 using System.Security.Claims;
 using System.Web.Security;
+using System.Web.Http.Cors;
 
 namespace ExpenseTracker.Controllers
 {
+    [EnableCors("*", "*", "*")]
     public class AuthController : ApiController
     {
         [Route("api/auth/login")]

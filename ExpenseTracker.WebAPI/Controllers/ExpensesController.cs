@@ -9,9 +9,11 @@ using ExpenseTracker.Models;
 using System.Threading;
 using System.Web.OData;
 using System.Threading.Tasks;
+using System.Web.Http.Cors;
 
 namespace ExpenseTracker.Controllers
 {
+    [EnableCors("*", "*", "GET,POST,PATCH,DELETE,OPTIONS")]
     [SimpleAuthorizationFilter]
     public class ExpensesController : ODataController
     {
@@ -31,7 +33,8 @@ namespace ExpenseTracker.Controllers
         [EnableQuery]
         public IQueryable<Expense> Get()
         {
-            return db.Expenses;
+            int userID = this.CurrentUser.Id;
+            return db.Expenses.Where(x => x.User.Id == userID);
         }
 
         public async Task<IHttpActionResult> Post(Expense expense)

@@ -158,8 +158,93 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\bootstrap.css" />
+    <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\datepicker.css" />
+    <Content Include="css\images\black-asc.gif" />
+    <Content Include="css\images\black-desc.gif" />
+    <Content Include="css\images\black-unsorted.gif" />
+    <Content Include="css\images\bootstrap-black-unsorted.png" />
+    <Content Include="css\images\bootstrap-white-unsorted.png" />
+    <Content Include="css\images\dropbox-asc-hovered.png" />
+    <Content Include="css\images\dropbox-asc.png" />
+    <Content Include="css\images\dropbox-desc-hovered.png" />
+    <Content Include="css\images\dropbox-desc.png" />
+    <Content Include="css\images\green-asc.gif" />
+    <Content Include="css\images\green-desc.gif" />
+    <Content Include="css\images\green-header.gif" />
+    <Content Include="css\images\green-unsorted.gif" />
+    <Content Include="css\images\ice-asc.gif" />
+    <Content Include="css\images\ice-desc.gif" />
+    <Content Include="css\images\ice-unsorted.gif" />
+    <Content Include="css\images\metro-black-asc.png" />
+    <Content Include="css\images\metro-black-desc.png" />
+    <Content Include="css\images\metro-loading.gif" />
+    <Content Include="css\images\metro-unsorted.png" />
+    <Content Include="css\images\metro-white-asc.png" />
+    <Content Include="css\images\metro-white-desc.png" />
+    <Content Include="css\images\white-asc.gif" />
+    <Content Include="css\images\white-desc.gif" />
+    <Content Include="css\images\white-unsorted.gif" />
+    <Content Include="css\Site.css" />
+    <Content Include="css\theme.default.css" />
     <Content Include="favicon.ico" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="index.html" />
+    <Content Include="Scripts\ExpenseApp.js" />
+    <Content Include="Scripts\ExpenseApp.Service.js" />
+    <Content Include="Scripts\ExpenseApp.Tests.js" />
+    <Content Include="Scripts\ExpenseApp.ViewModels.js" />
+    <Content Include="Scripts\libs\bootstrap-datepicker.js" />
+    <Content Include="Scripts\libs\bootstrap.js" />
+    <Content Include="Scripts\libs\bootstrap.min.js" />
+    <None Include="Scripts\libs\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\libs\jquery-1.10.2.js" />
+    <Content Include="Scripts\libs\jquery-1.10.2.min.js" />
+    <Content Include="Scripts\libs\jquery.base64.js" />
+    <Content Include="Scripts\libs\knockout-3.1.0.js" />
+    <Content Include="Scripts\libs\knockout.bind.numericValue.js" />
+    <Content Include="Scripts\libs\knockout.binds.datepicker.js" />
+    <None Include="Scripts\_references.js" />
+    <Content Include="Scripts\libs\tablesorter\extras\jquery.quicksearch.js" />
+    <Content Include="Scripts\libs\tablesorter\extras\semver-mod.js" />
+    <Content Include="Scripts\libs\tablesorter\extras\semver.js" />
+    <Content Include="Scripts\libs\tablesorter\jquery.metadata.js" />
+    <Content Include="Scripts\libs\tablesorter\jquery.tablesorter.js" />
+    <Content Include="Scripts\libs\tablesorter\jquery.tablesorter.widgets-filter-formatter-select2.js" />
+    <Content Include="Scripts\libs\tablesorter\jquery.tablesorter.widgets-filter-formatter.js" />
+    <Content Include="Scripts\libs\tablesorter\jquery.tablesorter.widgets.js" />
+    <Content Include="Scripts\libs\tablesorter\knockout.tablesorter.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-date-extract.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-date-iso8601.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-date-month.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-date-two-digit-year.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-date-weekday.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-date.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-feet-inch-fraction.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-file-type.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-ignore-articles.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-image.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-input-select.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-ipv6.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-metric.js" />
+    <Content Include="Scripts\libs\tablesorter\parsers\parser-roman.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-alignChar.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-build-table.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-columnSelector.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-cssStickyHeaders.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-editable.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-grouping.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-headerTitles.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-math.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-output.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-pager.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-print.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-reflow.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-repeatheaders.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-scroller.js" />
+    <Content Include="Scripts\libs\tablesorter\widgets\widget-staticRow.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -170,7 +255,25 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <None Include="Project_Readme.html" />
+    <Content Include="Scripts\ExpenseApp.js.map" />
+    <Content Include="Scripts\ExpenseApp.Service.js.map" />
+    <Content Include="Scripts\ExpenseApp.Tests.js.map" />
+    <Content Include="Scripts\ExpenseApp.ViewModels.js.map" />
+    <Content Include="Scripts\libs\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\ExpenseApp.Service.ts" />
+    <TypeScriptCompile Include="Scripts\ExpenseApp.Tests.ts" />
+    <TypeScriptCompile Include="Scripts\ExpenseApp.ts" />
+    <TypeScriptCompile Include="Scripts\ExpenseApp.ViewModels.ts" />
+    <TypeScriptCompile Include="Scripts\tslib\bootstrap.d.ts" />
+    <TypeScriptCompile Include="Scripts\tslib\jquery.base64.d.ts" />
+    <TypeScriptCompile Include="Scripts\tslib\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\tslib\knockout.d.ts" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

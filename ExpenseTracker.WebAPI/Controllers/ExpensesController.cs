@@ -53,7 +53,7 @@ namespace ExpenseTracker.Controllers
             return Created(expense);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Expense> expense)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Expense expense)
         {
             if (!ModelState.IsValid)
             {
@@ -67,7 +67,11 @@ namespace ExpenseTracker.Controllers
                 return NotFound();
             }
 
-            expense.Patch(entity);
+            entity.Amount = expense.Amount;
+            entity.Comment = expense.Comment;
+            entity.Date = expense.Date;
+            entity.Description = expense.Description;
+                        
             await db.SaveChangesAsync();
 
 

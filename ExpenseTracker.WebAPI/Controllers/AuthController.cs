@@ -12,9 +12,9 @@ using System.Web.Http.Cors;
 
 namespace ExpenseTracker.Controllers
 {
-    [EnableCors("*", "*", "*")]
     public class AuthController : ApiController
     {
+
         [Route("api/auth/login")]
         public IHttpActionResult IsRegistered(string username, string password)
         {

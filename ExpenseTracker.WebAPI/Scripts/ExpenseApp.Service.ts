@@ -8,6 +8,8 @@ module ExpenseApp.Services {
     }
 
     export interface IExpenseAppExpenseService {
+        SetUser(user: ExpenseAppUser);
+        GetUser(): ExpenseAppUser;
         GetAll(): JQueryPromise<IExpense[]>;
         AddExpense(expense: IExpense): JQueryPromise<void>;
         UpdateExpense(expense: IExpense): JQueryPromise<void>;
@@ -19,34 +21,83 @@ module ExpenseApp.Services {
         Password: string;
     }
 
-    export var WebAPIRootUrl = "http://localhost:52615";
+    export var WebAPIRootUrl = "api";
+
+    export class WebAPIAuthAppExpenseService implements IExpenseAppAuthService {
+        public AuthUrl = "/auth";
+
+
+        public Login(Username: string, Password: string) {
+            return $.ajax({
+                url: Services.WebAPIRootUrl + this.AuthUrl + "/login?username=" + Username + "&password=" + Password,
+                type: 'POST'
+            }).done(function (data) {
+                return new ExpenseAppUser(Username, Password);
+            });
+        }
+
+        public CreateAccount(Username: string, Password: string) {
+            return $.ajax({
+                url: Services.WebAPIRootUrl + this.AuthUrl + "/register?username=" + Username + "&password=" + Password,
+                type: 'POST'
+            }).done(function (data) {
+                return new ExpenseAppUser(Username, Password);
+            });
+        }
+    }
 
     export class WebAPIExpenseAppExpenseService implements IExpenseAppExpenseService {
-        public expensesUrl = "/Expenses";
+        public ExpensesUrl = "/Expenses";
         public User: ExpenseAppUser;
 
         constructor(user?: ExpenseAppUser) {
             if (user) {
-                $.ajaxSettings.headers = { 'Authorization': 'basic ' + user.GetAuthKey() };
                 this.User = user;
             }
         }
 
+        public SetUser(user: ExpenseAppUser) {
+            this.User = user;
+        }
+
+        public GetUser() {
+            return this.User;
+        }
+
         public GetAll() {
-            return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl, type: 'GET' }).then(function (data) { return data.value; });
+            return $.ajax({
+                url: Services.WebAPIRootUrl + this.ExpensesUrl,
+                type: 'GET',
+                headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() }
+            }).then(function (data) { return data.value; });
         }
 
         public AddExpense(expense: IExpense) {
-            return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl, data: expense, type: 'POST' });
+            $.ajaxSettings.headers = { 'Authorization': 'basic ' + this.User.GetAuthKey() };
+            return $.ajax({
+                url: Services.WebAPIRootUrl + this.ExpensesUrl,
+                data: expense, type: 'POST',
+                headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() }
+            });
         }
 
         public UpdateExpense(expense: IExpense) {
-            return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl + "(" + expense.Id + ")", data: JSON.stringify(expense), dataType: 'json', contentType: 'application/json', type: 'PATCH' });
+            return $.ajax({
+                url: Services.WebAPIRootUrl + this.ExpensesUrl + "(" + expense.Id + ")",
+                headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() },
+                data: JSON.stringify(expense),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'PATCH'
+            });
         }
 
         public RemoveExpense(expenseId: number) {
             return $.ajax({
-                url: Services.WebAPIRootUrl + this.expensesUrl + "(" + expenseId + ")", type: 'DELETE' });
+                url: Services.WebAPIRootUrl + this.ExpensesUrl + "(" + expenseId + ")",
+                headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() },
+                type: 'DELETE'
+            });
         }
     }
 
@@ -61,6 +112,15 @@ module ExpenseApp.Services {
                 { Id: 5, Date: new Date(2011, 9, 3), Description: "Food", Amount: 3.32, Comment: "Longer comment asd as ad aasdasdas das asd " },
                 { Id: 23, Date: new Date(2014, 4, 2), Description: "Other Things", Amount: 13.32, Comment: "Another Random Comment" }
             ];
+        }
+
+        public SetUser(user: ExpenseAppUser) {
+            // Uses Mock User
+        }
+
+        public GetUser() {
+            // Uses Mock User
+            return new ExpenseAppUser("test", "Test");
         }
 
         public GetAll() {
@@ -157,6 +217,6 @@ module ExpenseApp.Services {
 
 
     /* Simple Dependancy Injection */
-    export var Auth: IExpenseAppAuthService = new MockExpenseAppAuthService();
-    export var Expense: IExpenseAppExpenseService = new WebAPIExpenseAppExpenseService(new ExpenseAppUser("mike", "test"));
+    export var Auth: IExpenseAppAuthService = new WebAPIAuthAppExpenseService();
+    export var Expense: IExpenseAppExpenseService = new WebAPIExpenseAppExpenseService();
 } 

@@ -16,10 +16,12 @@ module ExpenseApp.ViewModels {
             this.CreateAccountVM = new CreateAccountViewModel(this.UserAuthenticated.bind(this));
             this.ExpensesVM = new ExpenseListingViewModel();
 
-            this.CurrentPage = ko.observable(ExpenseAppPage.ExpenseList);
+            this.CurrentPage = ko.observable(ExpenseAppPage.Login);
         }
 
         public UserAuthenticated(user: ExpenseAppUser) {
+            Services.Expense.SetUser(user);
+            this.ExpensesVM.IsAuthed(true);
             this.CurrentPage(ExpenseAppPage.ExpenseList);
         }
 
@@ -81,17 +83,36 @@ module ExpenseApp.ViewModels {
         public TopMessageType: KnockoutObservable<string>;
         public Loading: KnockoutObservable<boolean>;
         public EditCreateExpenseVM: KnockoutObservable<ExpenseViewModel>;
+        public FilteredExpenses: KnockoutComputed<ExpenseViewModel[]>;
+        public FilterString: KnockoutObservable<string>;
+        public IsAuthed: KnockoutObservable<boolean>;
 
         constructor() {
             this.EditCreateExpenseVM = ko.observable(new ExpenseViewModel(-1, new Date(), "", 0, ""));
             this.Expenses = ko.observableArray<ExpenseViewModel>();
             this.Loading = ko.observable(true);
+            this.FilteredExpenses = ko.computed(this.ComputeFilteredExpenses.bind(this));
+            this.FilterString = ko.observable("");
+            this.IsAuthed = ko.observable(false);
 
-            /* Get Expenses From the Service */
-            Services.Expense.GetAll().done(expenses => {
-                ko.utils.arrayPushAll(this.Expenses, $.map(expenses, exp => new ExpenseViewModel(exp.Id, new Date(Date.parse(exp.Date)), exp.Description, exp.Amount, exp.Comment))); 
-                this.Loading = ko.observable(false);
+            this.IsAuthed.subscribe((value) => {
+                if (value) {
+                    Services.Expense.GetAll().done(expenses => {
+                        ko.utils.arrayPushAll(this.Expenses, $.map(expenses, exp => new ExpenseViewModel(exp.Id, new Date(Date.parse(exp.Date)), exp.Description, exp.Amount, exp.Comment)));
+                        this.Loading = ko.observable(false);
+                    });
+                }
             });
+        }
+
+        public ComputeFilteredExpenses() {
+            return this.Expenses().filter((expense, index, arr) =>
+                    this.FilterString().length == 0 ||
+                    expense.Amount().toString().indexOf(this.FilterString()) > -1 ||
+                    expense.Comment().indexOf(this.FilterString()) > -1 ||
+                    expense.FormattedDate().indexOf(this.FilterString()) > -1 ||
+                    expense.Description().indexOf(this.FilterString()) > -1
+                );
         }
 
         public RemoveExpense(expense: ExpenseViewModel) {
@@ -109,7 +130,11 @@ module ExpenseApp.ViewModels {
         }
 
         public SaveNewExpense(expense: ExpenseViewModel) {
-            Services.Expense.AddExpense(expense.ToJSON()).done(() => this.Expenses.push(expense));
+            Services.Expense.AddExpense(expense.ToJSON()).done(() => {
+                this.Expenses.push(this.EditCreateExpenseVM());
+                this.EditCreateExpenseVM(new ExpenseViewModel(-1, new Date(), "", 0, ""));
+                this.FilteredExpenses.notifySubscribers();
+            });
             $("#EditExpenseDialog").modal("hide");
         }
 
@@ -186,14 +211,14 @@ module ExpenseApp.ViewModels {
         }
 
         public LoginClicked() {
-            Services.Auth.Login(this.Username(), this.Password()).always((result) => {
-                if (result == null) {
-                    this.LoginError("User not found");
-                } else {
+            Services.Auth.Login(this.Username(), this.Password())
+                .done((result) => {
                     this.LoginError(null);
-                    this.OnLogin(result);
-                }
-            });
+                    this.OnLogin(new ExpenseAppUser(this.Username(), this.Password()));
+                })
+                .fail((result) => {
+                    this.LoginError("Incorrect User/Pass");
+                });
         }
     }
 } 

@@ -10,32 +10,84 @@ var ExpenseApp;
         })();
         Services.IMockUser = IMockUser;
 
-        Services.WebAPIRootUrl = "http://localhost:52615";
+        Services.WebAPIRootUrl = "api";
+
+        var WebAPIAuthAppExpenseService = (function () {
+            function WebAPIAuthAppExpenseService() {
+                this.AuthUrl = "/auth";
+            }
+            WebAPIAuthAppExpenseService.prototype.Login = function (Username, Password) {
+                return $.ajax({
+                    url: Services.WebAPIRootUrl + this.AuthUrl + "/login?username=" + Username + "&password=" + Password,
+                    type: 'POST'
+                }).done(function (data) {
+                    return new ExpenseApp.ExpenseAppUser(Username, Password);
+                });
+            };
+
+            WebAPIAuthAppExpenseService.prototype.CreateAccount = function (Username, Password) {
+                return $.ajax({
+                    url: Services.WebAPIRootUrl + this.AuthUrl + "/register?username=" + Username + "&password=" + Password,
+                    type: 'POST'
+                }).done(function (data) {
+                    return new ExpenseApp.ExpenseAppUser(Username, Password);
+                });
+            };
+            return WebAPIAuthAppExpenseService;
+        })();
+        Services.WebAPIAuthAppExpenseService = WebAPIAuthAppExpenseService;
 
         var WebAPIExpenseAppExpenseService = (function () {
             function WebAPIExpenseAppExpenseService(user) {
-                this.expensesUrl = "/Expenses";
+                this.ExpensesUrl = "/Expenses";
                 if (user) {
-                    $.ajaxSettings.headers = { 'Authorization': 'basic ' + user.GetAuthKey() };
                     this.User = user;
                 }
             }
+            WebAPIExpenseAppExpenseService.prototype.SetUser = function (user) {
+                this.User = user;
+            };
+
+            WebAPIExpenseAppExpenseService.prototype.GetUser = function () {
+                return this.User;
+            };
+
             WebAPIExpenseAppExpenseService.prototype.GetAll = function () {
-                return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl, type: 'GET' }).then(function (data) {
+                return $.ajax({
+                    url: Services.WebAPIRootUrl + this.ExpensesUrl,
+                    type: 'GET',
+                    headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() }
+                }).then(function (data) {
                     return data.value;
                 });
             };
 
             WebAPIExpenseAppExpenseService.prototype.AddExpense = function (expense) {
-                return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl, data: expense, type: 'POST' });
+                $.ajaxSettings.headers = { 'Authorization': 'basic ' + this.User.GetAuthKey() };
+                return $.ajax({
+                    url: Services.WebAPIRootUrl + this.ExpensesUrl,
+                    data: expense, type: 'POST',
+                    headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() }
+                });
             };
 
             WebAPIExpenseAppExpenseService.prototype.UpdateExpense = function (expense) {
-                return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl + "(" + expense.Id + ")", data: JSON.stringify(expense), dataType: 'json', contentType: 'application/json', type: 'PATCH' });
+                return $.ajax({
+                    url: Services.WebAPIRootUrl + this.ExpensesUrl + "(" + expense.Id + ")",
+                    headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() },
+                    data: JSON.stringify(expense),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    type: 'PATCH'
+                });
             };
 
             WebAPIExpenseAppExpenseService.prototype.RemoveExpense = function (expenseId) {
-                return $.ajax({ url: Services.WebAPIRootUrl + this.expensesUrl + "(" + expenseId + ")", type: 'DELETE' });
+                return $.ajax({
+                    url: Services.WebAPIRootUrl + this.ExpensesUrl + "(" + expenseId + ")",
+                    headers: { 'Authorization': 'basic ' + this.User.GetAuthKey() },
+                    type: 'DELETE'
+                });
             };
             return WebAPIExpenseAppExpenseService;
         })();
@@ -51,6 +103,15 @@ var ExpenseApp;
                     { Id: 23, Date: new Date(2014, 4, 2), Description: "Other Things", Amount: 13.32, Comment: "Another Random Comment" }
                 ];
             }
+            MockExpenseAppExpenseService.prototype.SetUser = function (user) {
+                // Uses Mock User
+            };
+
+            MockExpenseAppExpenseService.prototype.GetUser = function () {
+                // Uses Mock User
+                return new ExpenseApp.ExpenseAppUser("test", "Test");
+            };
+
             MockExpenseAppExpenseService.prototype.GetAll = function () {
                 var _this = this;
                 var deferred = $.Deferred();
@@ -156,8 +217,8 @@ var ExpenseApp;
         Services.MockExpenseAppAuthService = MockExpenseAppAuthService;
 
         /* Simple Dependancy Injection */
-        Services.Auth = new MockExpenseAppAuthService();
-        Services.Expense = new WebAPIExpenseAppExpenseService(new ExpenseApp.ExpenseAppUser("mike", "test"));
+        Services.Auth = new WebAPIAuthAppExpenseService();
+        Services.Expense = new WebAPIExpenseAppExpenseService();
     })(ExpenseApp.Services || (ExpenseApp.Services = {}));
     var Services = ExpenseApp.Services;
 })(ExpenseApp || (ExpenseApp = {}));

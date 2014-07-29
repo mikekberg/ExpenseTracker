@@ -11,9 +11,11 @@ var ExpenseApp;
                 this.CreateAccountVM = new CreateAccountViewModel(this.UserAuthenticated.bind(this));
                 this.ExpensesVM = new ExpenseListingViewModel();
 
-                this.CurrentPage = ko.observable(2 /* ExpenseList */);
+                this.CurrentPage = ko.observable(0 /* Login */);
             }
             ExpenseAppViewModel.prototype.UserAuthenticated = function (user) {
+                ExpenseApp.Services.Expense.SetUser(user);
+                this.ExpensesVM.IsAuthed(true);
                 this.CurrentPage(2 /* ExpenseList */);
             };
 
@@ -75,15 +77,28 @@ var ExpenseApp;
                 this.EditCreateExpenseVM = ko.observable(new ExpenseViewModel(-1, new Date(), "", 0, ""));
                 this.Expenses = ko.observableArray();
                 this.Loading = ko.observable(true);
+                this.FilteredExpenses = ko.computed(this.ComputeFilteredExpenses.bind(this));
+                this.FilterString = ko.observable("");
+                this.IsAuthed = ko.observable(false);
 
-                /* Get Expenses From the Service */
-                ExpenseApp.Services.Expense.GetAll().done(function (expenses) {
-                    ko.utils.arrayPushAll(_this.Expenses, $.map(expenses, function (exp) {
-                        return new ExpenseViewModel(exp.Id, new Date(Date.parse(exp.Date)), exp.Description, exp.Amount, exp.Comment);
-                    }));
-                    _this.Loading = ko.observable(false);
+                this.IsAuthed.subscribe(function (value) {
+                    if (value) {
+                        ExpenseApp.Services.Expense.GetAll().done(function (expenses) {
+                            ko.utils.arrayPushAll(_this.Expenses, $.map(expenses, function (exp) {
+                                return new ExpenseViewModel(exp.Id, new Date(Date.parse(exp.Date)), exp.Description, exp.Amount, exp.Comment);
+                            }));
+                            _this.Loading = ko.observable(false);
+                        });
+                    }
                 });
             }
+            ExpenseListingViewModel.prototype.ComputeFilteredExpenses = function () {
+                var _this = this;
+                return this.Expenses().filter(function (expense, index, arr) {
+                    return _this.FilterString().length == 0 || expense.Amount().toString().indexOf(_this.FilterString()) > -1 || expense.Comment().indexOf(_this.FilterString()) > -1 || expense.FormattedDate().indexOf(_this.FilterString()) > -1 || expense.Description().indexOf(_this.FilterString()) > -1;
+                });
+            };
+
             ExpenseListingViewModel.prototype.RemoveExpense = function (expense) {
                 ExpenseApp.Services.Expense.RemoveExpense(expense.Id).done(this.Expenses.remove.bind(this.Expenses, expense));
             };
@@ -101,7 +116,9 @@ var ExpenseApp;
             ExpenseListingViewModel.prototype.SaveNewExpense = function (expense) {
                 var _this = this;
                 ExpenseApp.Services.Expense.AddExpense(expense.ToJSON()).done(function () {
-                    return _this.Expenses.push(expense);
+                    _this.Expenses.push(_this.EditCreateExpenseVM());
+                    _this.EditCreateExpenseVM(new ExpenseViewModel(-1, new Date(), "", 0, ""));
+                    _this.FilteredExpenses.notifySubscribers();
                 });
                 $("#EditExpenseDialog").modal("hide");
             };
@@ -173,13 +190,11 @@ var ExpenseApp;
             }
             LoginViewModel.prototype.LoginClicked = function () {
                 var _this = this;
-                ExpenseApp.Services.Auth.Login(this.Username(), this.Password()).always(function (result) {
-                    if (result == null) {
-                        _this.LoginError("User not found");
-                    } else {
-                        _this.LoginError(null);
-                        _this.OnLogin(result);
-                    }
+                ExpenseApp.Services.Auth.Login(this.Username(), this.Password()).done(function (result) {
+                    _this.LoginError(null);
+                    _this.OnLogin(new ExpenseApp.ExpenseAppUser(_this.Username(), _this.Password()));
+                }).fail(function (result) {
+                    _this.LoginError("Incorrect User/Pass");
                 });
             };
             return LoginViewModel;

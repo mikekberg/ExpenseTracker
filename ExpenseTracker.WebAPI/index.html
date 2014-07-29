@@ -7,7 +7,7 @@
     <link href="css/bootstrap.css" rel="stylesheet" />
     <link href="css/datepicker.css" rel="stylesheet" />
     <link href="css/Site.css" rel="stylesheet" />
-   
+
     <style>
         .center {
             float: none;
@@ -86,18 +86,27 @@
                 </form>
             </div>
         </div>
+        <!-- ko if: ExpensesVM.IsAuthed -->
         <div class="row app-page" data-bind="visible: OnPage(ExpenseApp.ExpenseAppPage.ExpenseList), with: ExpensesVM">
             <div class="col-md-9">
                 <h1>Expense Listing</h1>
-                <div class="actionsBar">
-                    <button class="btn btn-success" data-bind="click: AddNewExpense">
-                        <span class="glyphicon glyphicon-plus"></span> Add Expense
-                    </button>
-                    <button class="btn btn-primary">
-                        <span class="glyphicon glyphicon-print"></span> Print Weekly Report
-                    </button>
+                <div class="row">
+                    <div class="col-md-4" style="padding-top: 5px;">
+                        <input class="form-control" placeholder="Filter Expenses" data-bind="value: FilterString, valueUpdate: 'afterkeydown'" />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="actionsBar">
+                            <button class="btn btn-success" data-bind="click: AddNewExpense">
+                                <span class="glyphicon glyphicon-plus"></span> Add Expense
+                            </button>
+                            <button class="btn btn-primary">
+                                <span class="glyphicon glyphicon-print"></span> Print Weekly Report
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <table id="expenseList" class="table table-hover" data-bind="sortTable: true">
+
+                <table id="expenseList" class="table table-hover">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -115,7 +124,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody data-bind="foreach: Expenses">
+                    <tbody data-bind="foreach: FilteredExpenses">
                         <tr>
                             <td data-bind="text: FormattedDate"></td>
                             <td data-bind="text: Description"></td>
@@ -137,7 +146,7 @@
                 </table>
             </div>
         </div>
-
+        <!-- /ko -->
         <div id="EditExpenseDialog" class="modal fade" data-bind="with: $root.ExpensesVM.EditCreateExpenseVM">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -188,7 +197,7 @@
     <script src="Scripts/ExpenseApp.js"></script>
     <script src="Scripts/ExpenseApp.Service.js"></script>
     <script src="Scripts/ExpenseApp.ViewModels.js"></script>
-    
+
     <script>
         window.AppViewModel = new ExpenseApp.ViewModels.ExpenseAppViewModel();
         ko.applyBindings(window.AppViewModel);
